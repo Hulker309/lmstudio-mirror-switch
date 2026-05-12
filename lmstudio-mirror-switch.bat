@@ -4,7 +4,8 @@ title LM Studio 镜像切换工具
 
 echo ========================================
 echo     LM Studio 镜像切换工具
-echo     将 huggingface.co ^-^> hf-mirror.com
+echo     huggingface.co ^-^> hf-mirror.com
+echo     兼容 0.39 ~ 0.48 版本
 echo ========================================
 echo.
 
@@ -70,6 +71,10 @@ powershell -NoProfile -Command ^
         Write-Host '  ✓ 已备份 main/index.js.bak'; ^
     }; ^
     $c = (Get-Content $main -Raw) -replace 'https://huggingface\.co', 'https://hf-mirror.com'; ^
+    if ($c -notmatch 'NODE_TLS_REJECT_UNAUTHORIZED') { ^
+        $c = 'process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";' + "`n" + $c; ^
+        Write-Host '  ✓ 已注入 TLS 跳过'; ^
+    }; ^
     $n = [regex]::Matches($c, 'hf-mirror\.com').Count; ^
     $c | Set-Content $main -NoNewline -Encoding UTF8; ^
     Write-Host ('  ✓ main/index.js 替换 ' + $n + ' 处'); ^
